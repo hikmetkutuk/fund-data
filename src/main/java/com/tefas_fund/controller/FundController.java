@@ -1,10 +1,8 @@
 package com.tefas_fund.controller;
 
+import com.tefas_fund.service.FundService;
 import com.tefas_fund.service.SeleniumWorkerService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,9 +12,11 @@ import java.util.Map;
 @RequestMapping("/api/fund")
 public class FundController {
     private final SeleniumWorkerService seleniumWorkerService;
+    private final FundService fundService;
 
-    public FundController(SeleniumWorkerService seleniumWorkerService) {
+    public FundController(SeleniumWorkerService seleniumWorkerService, FundService fundService) {
         this.seleniumWorkerService = seleniumWorkerService;
+        this.fundService = fundService;
     }
 
     @GetMapping("/process")

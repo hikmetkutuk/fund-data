@@ -18,6 +18,12 @@ import java.util.Map;
 
 @Service
 public class SeleniumWorkerService {
+    private final FundService fundService;
+
+    public SeleniumWorkerService(FundService fundService) {
+        this.fundService = fundService;
+    }
+
     public List<Map<String, Object>> getData(String fund) {
         WebDriverManager.chromedriver().setup();
 
@@ -53,6 +59,7 @@ public class SeleniumWorkerService {
                 result.add(dataPoint);
             }
 
+            fundService.saveFundData(fund, result);
             return result;
 
         } catch (Exception e) {
