@@ -1,5 +1,8 @@
 package com.tefas_fund.service;
 
+import com.tefas_fund.model.FundPrice;
+import com.tefas_fund.repository.FundListRepository;
+import com.tefas_fund.repository.FundPriceRepository;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -11,20 +14,21 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
+import java.time.format.DateTimeFormatter;
 
 @Service
-public class SeleniumWorkerService {
-    private final FundService fundService;
+public class FundPriceService {
+    private final FundPriceRepository fundPriceRepository;
+    private final FundListService fundListService;
 
-    public SeleniumWorkerService(FundService fundService) {
-        this.fundService = fundService;
+    public FundPriceService(FundPriceRepository fundPriceRepository, FundListService fundListService) {
+        this.fundPriceRepository = fundPriceRepository;
+        this.fundListService = fundListService;
     }
 
-    public List<Map<String, Object>> getData(String fund) {
+    public void getData(String fund) {
         WebDriverManager.chromedriver().setup();
 
         ChromeOptions options = new ChromeOptions();
@@ -59,13 +63,48 @@ public class SeleniumWorkerService {
                 result.add(dataPoint);
             }
 
-            fundService.saveFundData(fund, result);
-            return result;
+            saveFundPriceData(fund, result);
 
         } catch (Exception e) {
             throw new RuntimeException("Error while scraping data for ticker: " + fund, e);
         } finally {
             driver.quit();
+        }
+    }
+
+    public void saveFundPriceData(String symbol, List<Map<String, Object>> data) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        for (Map<String, Object> entry : data) {
+            String dateStr = (String) entry.get("date");
+            Object priceObject = entry.get("price");
+            double price = 0.0;
+
+            if (priceObject instanceof Long) {
+                price = ((Long) priceObject).doubleValue();
+            } else if (priceObject instanceof Double) {
+                price = (Double) priceObject;
+            }
+
+            LocalDate date = LocalDate.parse(dateStr, formatter);
+
+            Optional<FundPrice> existingData = fundPriceRepository.findBySymbolAndDate(symbol, date);
+            if (existingData.isPresent()) {
+                System.out.println("Data already exists for symbol: " + symbol + " and date: " + date);
+            } else {
+                FundPrice fund = new FundPrice();
+                fund.setSymbol(symbol);
+                fund.setDate(date);
+                fund.setPrice(price);
+
+                fundPriceRepository.save(fund);
+            }
+        }
+    }
+
+    public void getPriceHistory() {
+        var funds = fundListService.getAllFunds();
+        for (String fund : funds) {
+            getData(fund);
         }
     }
 }

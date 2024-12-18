@@ -8,6 +8,6 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 @Repository
-public interface FundRepository extends JpaRepository<FundPrice, Long> {
+public interface FundPriceRepository extends JpaRepository<FundPrice, Long> {
     Optional<FundPrice> findBySymbolAndDate(String symbol, LocalDate date);
 }
