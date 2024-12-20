@@ -21,4 +21,9 @@ public class FundPriceController {
     public void getData(@PathVariable String fund) {
         fundPriceService.getData(fund);
     }
+
+    @GetMapping("/daily")
+    public void fetchFundData() {
+        fundPriceService.getDailyPrice();
+    }
 }

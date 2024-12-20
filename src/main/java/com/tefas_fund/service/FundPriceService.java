@@ -106,4 +106,37 @@ public class FundPriceService {
             getData(fund);
         }
     }
+
+    public void saveDailyPrice(String fund) {
+        WebDriverManager.chromedriver().setup();
+        WebDriver driver = new ChromeDriver();
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        try {
+            String url = "https://www.tefas.gov.tr/FonAnaliz.aspx?FonKod=" + fund;
+            driver.get(url);
+            Thread.sleep(2000);
+            WebElement spanElement = driver.findElements(By.tagName("span")).get(3);
+            String data = spanElement.getText();
+
+            Map<String, Object> dataPoint = new HashMap<>();
+            dataPoint.put("date", LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+            dataPoint.put("price", Double.parseDouble(data.replace(",", ".")));
+            result.add(dataPoint);
+            saveFundPriceData(fund, result);
+        } catch (Exception e) {
+            System.out.println("Fon Kodu: " + fund + ", Hata: Veri alınamadı. " + e.getMessage());
+        } finally {
+            driver.quit();
+        }
+
+    }
+
+    public void getDailyPrice() {
+        var funds = fundListService.getAllFunds();
+
+        for (String fund : funds) {
+            saveDailyPrice(fund);
+        }
+    }
 }
