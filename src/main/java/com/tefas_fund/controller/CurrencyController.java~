@@ -16,8 +16,8 @@ public class CurrencyController {
     }
 
     @GetMapping("/usdtry")
-    public void getUsdTryRate() {
-        currencyService.getUsdTryRate();
+    public String getUsdTryPrice() {
+        return currencyService.getUsdTryPrice(true);
     }
 
     @GetMapping("/csv")

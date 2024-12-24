@@ -35,7 +35,7 @@ public class FundService {
         FundPrice oneMonthAgoPrice = fundPriceRepository.findByFundSymbolAndClosestDate(symbol, oneMonthAgo)
                 .orElseThrow(() -> new IllegalArgumentException("Bir ay önceye yakın fon verisi bulunamadı."));
 
-        double currentFundValueInUsd = todayPrice.getPrice() / currencyService.getUsdTryPrice(false);
+        double currentFundValueInUsd = todayPrice.getPrice() / currencyService.getCurrencyPrice("USDTRY", today);
         double previousFundValueInUsd = oneMonthAgoPrice.getPrice() / currencyService.getCurrencyPrice("USDTRY", oneMonthAgo);
 
         if (previousFundValueInUsd == 0) {

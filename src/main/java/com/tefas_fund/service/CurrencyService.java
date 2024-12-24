@@ -31,7 +31,7 @@ public class CurrencyService {
     }
 
     @Transactional
-    public String getUsdTryRate() {
+    public Double getUsdTryPrice(boolean willBeRecorded) {
         WebDriverManager.chromedriver().setup();
 
         ChromeOptions options = new ChromeOptions();
@@ -52,9 +52,9 @@ public class CurrencyService {
                     price
             );
             saveUsdTryPrice(dailyUsdPrice);
-            return "USDTRY verisi başarıyla alındı ve kaydedildi.";
+            return price;
         } catch (Exception e) {
-            return "Hata: Veri alınamadı. " + e.getMessage();
+            throw new RuntimeException("Beklenmeyen hata oluştu: " + e.getMessage());
         } finally {
             driver.quit();
         }
@@ -103,5 +103,9 @@ public class CurrencyService {
         for (Record record : records) {
             System.out.println(record);
         }
+    }
+
+    public Double getCurrencyPrice(String currency, LocalDate date) {
+        return currencyRepository.findByCurrencyAndDate(currency, date).get().getPrice();
     }
 }

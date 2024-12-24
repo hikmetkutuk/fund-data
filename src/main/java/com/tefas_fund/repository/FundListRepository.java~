@@ -1,9 +1,0 @@
-package com.tefas_fund.repository;
-
-import com.tefas_fund.model.FundList;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-@Repository
-public interface FundListRepository extends JpaRepository<FundList, Long> {
-}

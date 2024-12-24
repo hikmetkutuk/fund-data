@@ -20,11 +20,11 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class FundPriceService {
     private final FundPriceRepository fundPriceRepository;
-    private final FundService fundService;
+    private final FundService fundListService;
 
-    public FundPriceService(FundPriceRepository fundPriceRepository, FundService fundService) {
+    public FundPriceService(FundPriceRepository fundPriceRepository, FundService fundListService) {
         this.fundPriceRepository = fundPriceRepository;
-        this.fundService = fundService;
+        this.fundListService = fundListService;
     }
 
     public void getData(String fund) {
@@ -101,7 +101,7 @@ public class FundPriceService {
     }
 
     public void getPriceHistory() {
-        var funds = fundService.getAllFunds();
+        var funds = fundListService.getAllFunds();
         for (String fund : funds) {
             getData(fund);
         }
@@ -133,7 +133,7 @@ public class FundPriceService {
     }
 
     public void getDailyPrice() {
-        var funds = fundService.getAllFunds();
+        var funds = fundListService.getAllFunds();
 
         for (String fund : funds) {
             saveDailyPrice(fund);

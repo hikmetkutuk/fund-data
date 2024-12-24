@@ -3,8 +3,8 @@ package com.tefas_fund.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "fund_list")
-public class FundList {
+@Table(name = "funds")
+public class Fund {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
