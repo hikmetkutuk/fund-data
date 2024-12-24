@@ -1,4 +1,4 @@
-> If a record has been added manually from the outside 
+If a record has been added manually from the outside 
 and the order of the auto-incrementing primary key (e.g. SERIAL or BIGSERIAL) is mixed up, 
 PostgreSQL may give a duplicate key value violates unique constraint error 
 when you try to add a new record because it conflicts with an existing primary key value. 
@@ -8,7 +8,7 @@ This is usually caused by the sequence not being set correctly.
 
 ---
 
-> If you want to find records in the fund_list table that are not matched with the query result in the fund_prices table 
+If you want to find records in the fund_list table that are not matched with the query result in the fund_prices table 
 (that is, records in the fund_list table but not in the fund_prices query), 
 you can use the following method:
 

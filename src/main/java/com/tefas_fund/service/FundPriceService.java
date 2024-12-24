@@ -139,4 +139,8 @@ public class FundPriceService {
             saveDailyPrice(fund);
         }
     }
+
+    public void getDailyPriceBySymbol(String fund) {
+        saveDailyPrice(fund);
+    }
 }
