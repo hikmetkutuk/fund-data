@@ -97,9 +97,11 @@ public class CurrencyService {
                     records.add(record);
                 }
             }
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
         for (Record record : records) {
             System.out.println(record);
         }

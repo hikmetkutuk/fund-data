@@ -1,5 +1,6 @@
 package com.tefas_fund.controller;
 
+import com.tefas_fund.dto.CurrencyRequest;
 import com.tefas_fund.service.CurrencyService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
