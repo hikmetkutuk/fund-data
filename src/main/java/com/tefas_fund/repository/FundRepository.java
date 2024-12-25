@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface FundListRepository extends JpaRepository<Fund, Long> {
+public interface FundRepository extends JpaRepository<Fund, Long> {
     List<Fund> findAllByIdGreaterThan(Long id);
+    Fund findBySymbol(String symbol);
 }

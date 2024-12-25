@@ -12,4 +12,4 @@ This is usually caused by the sequence not being set correctly.
 (that is, records in the fund_list table but not in the fund_prices query), 
 you can use the following method:
 
-``SELECT fl.* FROM public.fund_list fl LEFT JOIN public.fund_prices fp ON fl.id = fp.id AND fp.date = '2024-12-24' WHERE fp.id IS NULL``
+``SELECT fl.* FROM public.funds fl LEFT JOIN public.fund_prices fp ON fl.id = fp.id AND fp.date = '2024-12-24' WHERE fp.id IS NULL``
