@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: fund
     volumes:
-      - ../data/db/:/var/lib/postgresql/data
+      - ../backend/data/db/:/var/lib/postgresql/data
     ports:
       - "5435:5432"
     restart: unless-stopped
