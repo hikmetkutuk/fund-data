@@ -3,9 +3,11 @@ package com.tefas_fund.service;
 import com.tefas_fund.dto.CalculateResponse;
 import com.tefas_fund.model.Fund;
 import com.tefas_fund.model.FundPrice;
+import com.tefas_fund.model.Yield;
+import com.tefas_fund.repository.YieldRepository;
 import com.tefas_fund.repository.FundRepository;
 import com.tefas_fund.repository.FundPriceRepository;
-import org.springframework.cache.annotation.Cacheable;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -21,17 +23,36 @@ public class FundService {
     private final FundRepository fundRepository;
     private final FundPriceRepository fundPriceRepository;
     private final CurrencyService currencyService;
+    private final YieldRepository yieldRepository;
 
     private static final LocalDate TODAY = LocalDate.now();
 
-    public FundService(FundRepository fundRepository, FundPriceRepository fundPriceRepository, CurrencyService currencyService) {
+    public FundService(FundRepository fundRepository, FundPriceRepository fundPriceRepository, CurrencyService currencyService, YieldRepository yieldRepository) {
         this.fundRepository = fundRepository;
         this.fundPriceRepository = fundPriceRepository;
         this.currencyService = currencyService;
+        this.yieldRepository = yieldRepository;
     }
 
     public List<String> getAllFunds() {
         return fundRepository.findAll().stream().map(Fund::getSymbol).toList();
+    }
+
+    @Transactional
+    public String updateYield() {
+        try {
+            List<CalculateResponse> newRecords = calculate();
+
+            yieldRepository.deleteAll();
+
+            List<Yield> entitiesToSave = newRecords.stream()
+                    .map(this::mapToEntity)
+                    .toList();
+            yieldRepository.saveAll(entitiesToSave);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "Successfully updated";
     }
 
     public List<CalculateResponse> calculate() {
@@ -79,11 +100,12 @@ public class FundService {
                 calculateGrowth(fund, TODAY.minusYears(4), currencyPrices),
                 calculateGrowth(fund, TODAY.minusYears(5), currencyPrices),
                 calculateGrowth(fund, TODAY.minusYears(7), currencyPrices),
-                calculateGrowth(fund, TODAY.minusYears(10), currencyPrices)
+                calculateGrowth(fund, TODAY.minusYears(10), currencyPrices),
+                0
         );
     }
 
-    private Object calculateGrowth(String symbol, LocalDate previousDate, Map<LocalDate, Double> currencyPrices) {
+    private double calculateGrowth(String symbol, LocalDate previousDate, Map<LocalDate, Double> currencyPrices) {
         FundPrice todayPrice = fetchTodayFundPrice(symbol);
         Optional<FundPrice> previousFundPrice = fundPriceRepository.findByFundSymbolAndClosestDate(symbol, previousDate);
 
@@ -92,7 +114,7 @@ public class FundService {
                 .orElse(0.0);
 
         if (previousPriceInUsd == 0) {
-            return null;
+            return 0;
         }
 
         return ((currentPriceInUsd - previousPriceInUsd) / previousPriceInUsd) * 100;
@@ -101,5 +123,24 @@ public class FundService {
     private FundPrice fetchTodayFundPrice(String symbol) {
         return fundPriceRepository.findByFundSymbolAndDate(symbol, TODAY)
                 .orElseThrow(() -> new IllegalArgumentException("Fund price not found for today."));
+    }
+
+    private Yield mapToEntity(CalculateResponse response) {
+        return new Yield(
+                response.symbol(),
+                response.index(),
+                response.oneMonthGrowth(),
+                response.threeMonthGrowth(),
+                response.sixMonthGrowth(),
+                response.ytdGrowth(),
+                response.oneYearGrowth(),
+                response.twoYearGrowth(),
+                response.threeYearGrowth(),
+                response.fourYearGrowth(),
+                response.fiveYearGrowth(),
+                response.sevenYearGrowth(),
+                response.tenYearGrowth(),
+                0
+        );
     }
 }
