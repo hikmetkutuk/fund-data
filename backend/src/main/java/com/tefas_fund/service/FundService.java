@@ -7,7 +7,10 @@ import com.tefas_fund.model.Yield;
 import com.tefas_fund.repository.YieldRepository;
 import com.tefas_fund.repository.FundRepository;
 import com.tefas_fund.repository.FundPriceRepository;
+import com.tefas_fund.util.YieldSpecification;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -142,5 +145,10 @@ public class FundService {
                 response.tenYearGrowth(),
                 0
         );
+    }
+
+    public Page<Yield> getYield(String searchTerm, Pageable pageable) {
+        YieldSpecification spec = new YieldSpecification(searchTerm);
+        return yieldRepository.findAll(spec, pageable);
     }
 }
