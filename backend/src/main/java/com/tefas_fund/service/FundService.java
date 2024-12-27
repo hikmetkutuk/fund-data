@@ -120,7 +120,8 @@ public class FundService {
             return 0;
         }
 
-        return ((currentPriceInUsd - previousPriceInUsd) / previousPriceInUsd) * 100;
+        double growth = ((currentPriceInUsd - previousPriceInUsd) / previousPriceInUsd) * 100;
+        return Math.round(growth * 100.0) / 100.0;
     }
 
     private FundPrice fetchTodayFundPrice(String symbol) {
