@@ -13,7 +13,10 @@ export interface IYield {
     threeYear: number;
     fourYear: number;
     fiveYear: number;
+    sixYear: number;
     sevenYear: number;
+    eightYear: number;
+    nineYear: number;
     tenYear: number;
     point: number;
 }

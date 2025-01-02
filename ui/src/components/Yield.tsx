@@ -45,7 +45,10 @@ const Yield = () => {
     createColumn("threeYear", "3Y"),
     createColumn("fourYear", "4Y"),
     createColumn("fiveYear", "5Y"),
+    createColumn("sixYear", "6Y"),
     createColumn("sevenYear", "7Y"),
+    createColumn("eightYear", "8Y"),
+    createColumn("nineYear", "9Y"),
     createColumn("tenYear", "10Y"),
     createColumn("point", "Point"),
   ];
@@ -64,7 +67,10 @@ const Yield = () => {
     threeYear: item.threeYear,
     fourYear: item.fourYear,
     fiveYear: item.fiveYear,
+    sixYear: item.sixYear,
     sevenYear: item.sevenYear,
+    eightYear: item.eightYear,
+    nineYear: item.nineYear,
     tenYear: item.tenYear,
     point: item.point,
   }));

@@ -81,7 +81,10 @@ public class FundService {
                         TODAY.minusYears(3),
                         TODAY.minusYears(4),
                         TODAY.minusYears(5),
+                        TODAY.minusYears(6),
                         TODAY.minusYears(7),
+                        TODAY.minusYears(8),
+                        TODAY.minusYears(9),
                         TODAY.minusYears(10)
                 )
                 .distinct()
@@ -102,7 +105,10 @@ public class FundService {
                 calculateGrowth(fund, TODAY.minusYears(3), currencyPrices),
                 calculateGrowth(fund, TODAY.minusYears(4), currencyPrices),
                 calculateGrowth(fund, TODAY.minusYears(5), currencyPrices),
+                calculateGrowth(fund, TODAY.minusYears(6), currencyPrices),
                 calculateGrowth(fund, TODAY.minusYears(7), currencyPrices),
+                calculateGrowth(fund, TODAY.minusYears(8), currencyPrices),
+                calculateGrowth(fund, TODAY.minusYears(9), currencyPrices),
                 calculateGrowth(fund, TODAY.minusYears(10), currencyPrices),
                 0
         );
@@ -142,7 +148,10 @@ public class FundService {
                 response.threeYearGrowth(),
                 response.fourYearGrowth(),
                 response.fiveYearGrowth(),
+                response.sixYearGrowth(),
                 response.sevenYearGrowth(),
+                response.eightYearGrowth(),
+                response.nineYearGrowth(),
                 response.tenYearGrowth(),
                 0
         );

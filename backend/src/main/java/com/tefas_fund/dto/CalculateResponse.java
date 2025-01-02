@@ -12,7 +12,10 @@ public record CalculateResponse(
     double threeYearGrowth,
     double fourYearGrowth,
     double fiveYearGrowth,
+    double sixYearGrowth,
     double sevenYearGrowth,
+    double eightYearGrowth,
+    double nineYearGrowth,
     double tenYearGrowth,
     int point
 ) {

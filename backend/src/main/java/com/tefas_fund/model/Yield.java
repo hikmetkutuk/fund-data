@@ -20,7 +20,10 @@ public class Yield {
     private Double threeYear;
     private Double fourYear;
     private Double fiveYear;
+    private Double sixYear;
     private Double sevenYear;
+    private Double eightYear;
+    private Double nineYear;
     private Double tenYear;
     private double point;
 
@@ -28,7 +31,24 @@ public class Yield {
     public Yield() {
     }
 
-    public Yield(String symbol, String index, Double oneMonth, Double threeMonth, Double sixMonth, Double ytd, Double oneYear, Double twoYear, Double threeYear, Double fourYear, Double fiveYear, Double sevenYear, Double tenYear, double point) {
+    public Yield(
+            String symbol,
+            String index,
+            Double oneMonth,
+            Double threeMonth,
+            Double sixMonth,
+            Double ytd,
+            Double oneYear,
+            Double twoYear,
+            Double threeYear,
+            Double fourYear,
+            Double fiveYear,
+            Double sixYear,
+            Double sevenYear,
+            Double eightYear,
+            Double nineYear,
+            Double tenYear,
+            double point) {
         this.symbol = symbol;
         this.index = index;
         this.oneMonth = oneMonth;
@@ -40,7 +60,10 @@ public class Yield {
         this.threeYear = threeYear;
         this.fourYear = fourYear;
         this.fiveYear = fiveYear;
+        this.sixYear = sixYear;
         this.sevenYear = sevenYear;
+        this.eightYear = eightYear;
+        this.nineYear = nineYear;
         this.tenYear = tenYear;
         this.point = point;
     }
@@ -141,12 +164,36 @@ public class Yield {
         this.fiveYear = fiveYear;
     }
 
+    public Double getSixYear() {
+        return sixYear;
+    }
+
+    public void setSixYear(Double sixYear) {
+        this.sixYear = sixYear;
+    }
+
     public Double getSevenYear() {
         return sevenYear;
     }
 
     public void setSevenYear(Double sevenYear) {
         this.sevenYear = sevenYear;
+    }
+
+    public Double getEightYear() {
+        return eightYear;
+    }
+
+    public void setEightYear(Double eightYear) {
+        this.eightYear = eightYear;
+    }
+
+    public Double getNineYear() {
+        return nineYear;
+    }
+
+    public void setNineYear(Double nineYear) {
+        this.nineYear = nineYear;
     }
 
     public Double getTenYear() {
