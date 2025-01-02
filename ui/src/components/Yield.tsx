@@ -85,10 +85,12 @@ const Yield = () => {
   };
 
   return (
-    <div className="w-full mx-auto py-10">
+    <div className="w-11/12 mx-auto py-10 dark:text-orange-200 text-xs">
+      <h1 className="text-2xl font-bold mb-4 dark:text-orange-200 text-center">Fund Yield</h1>
       <DataTable columns={columns} data={serializedData} filterBy="symbol" pageSize={pagination.pageSize} />
-      <div className="flex items-center justify-between py-4">
+      <div className="flex items-center justify-between py-4 dark:bg-slate-800 text-xs">
         <Button
+          className="bg-orange-200 text-slate-800"
           variant="outline"
           size="sm"
           onClick={() => setPagination((prev) => ({ ...prev, pageIndex: Math.max(0, prev.pageIndex - 1) }))}
@@ -105,12 +107,13 @@ const Yield = () => {
             min={1}
             max={totalPages}
             onChange={handlePageChange}
-            className="w-16 border rounded text-center"
+            className="w-16 border rounded text-center text-slate-800"
           />
           <span>of {totalPages}</span>
         </div>
 
         <Button
+         className="bg-orange-200 text-slate-800"
           variant="outline"
           size="sm"
           onClick={() => setPagination((prev) => ({ ...prev, pageIndex: Math.min(totalPages - 1, prev.pageIndex + 1) }))}
