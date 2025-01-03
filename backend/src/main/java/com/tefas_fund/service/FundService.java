@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -93,7 +94,7 @@ public class FundService {
 
     private CalculateResponse calculateResponseForFund(String fund, Map<LocalDate, Double> currencyPrices) {
         Fund fundData = fundRepository.findBySymbol(fund);
-        return new CalculateResponse(
+        CalculateResponse response = new CalculateResponse(
                 fund,
                 fundData.getIndex(),
                 calculateGrowth(fund, TODAY.minusMonths(1), currencyPrices),
@@ -111,6 +112,27 @@ public class FundService {
                 calculateGrowth(fund, TODAY.minusYears(9), currencyPrices),
                 calculateGrowth(fund, TODAY.minusYears(10), currencyPrices),
                 0
+        );
+        double point = calculatePoints(response);
+
+        return new CalculateResponse(
+                response.symbol(),
+                response.index(),
+                response.oneMonthGrowth(),
+                response.threeMonthGrowth(),
+                response.sixMonthGrowth(),
+                response.ytdGrowth(),
+                response.oneYearGrowth(),
+                response.twoYearGrowth(),
+                response.threeYearGrowth(),
+                response.fourYearGrowth(),
+                response.fiveYearGrowth(),
+                response.sixYearGrowth(),
+                response.sevenYearGrowth(),
+                response.eightYearGrowth(),
+                response.nineYearGrowth(),
+                response.tenYearGrowth(),
+                point
         );
     }
 
@@ -153,12 +175,62 @@ public class FundService {
                 response.eightYearGrowth(),
                 response.nineYearGrowth(),
                 response.tenYearGrowth(),
-                0
+                response.point()
         );
     }
 
     public Page<Yield> getYield(String searchTerm, Pageable pageable) {
         YieldSpecification spec = new YieldSpecification(searchTerm);
         return yieldRepository.findAll(spec, pageable);
+    }
+
+    private double calculatePoints(CalculateResponse response) {
+        Map<String, Double> weights = new HashMap<>();
+        weights.put("1M", 0.14925);   // 1 month
+        weights.put("3M", 0.44775);   // 3 months
+        weights.put("6M", 0.8955);   // 6 months
+        weights.put("YTD", 0.0);  // YTD
+        weights.put("1Y", 1.7935);   // 1 year + 0,0025
+        weights.put("2Y", 3.582);   // 2 years
+        weights.put("3Y", 5.373);   // 3 years
+        weights.put("4Y", 7.164);   // 4 years
+        weights.put("5Y", 8.955);   // 5 years
+        weights.put("6Y", 10.746);   // 6 years
+        weights.put("7Y", 12.537);   // 7 years
+        weights.put("8Y", 14.328);   // 8 years
+        weights.put("9Y", 16.119);   // 9 years
+        weights.put("10Y", 17.91);  // 10 years
+
+        // Map periods to their growth values
+        Map<String, Double> growthValues = new HashMap<>();
+        growthValues.put("1M", response.oneMonthGrowth());
+        growthValues.put("3M", response.threeMonthGrowth());
+        growthValues.put("6M", response.sixMonthGrowth());
+        growthValues.put("YTD", response.ytdGrowth());
+        growthValues.put("1Y", response.oneYearGrowth());
+        growthValues.put("2Y", response.twoYearGrowth());
+        growthValues.put("3Y", response.threeYearGrowth());
+        growthValues.put("4Y", response.fourYearGrowth());
+        growthValues.put("5Y", response.fiveYearGrowth());
+        growthValues.put("6Y", response.sixYearGrowth());
+        growthValues.put("7Y", response.sevenYearGrowth());
+        growthValues.put("8Y", response.eightYearGrowth());
+        growthValues.put("9Y", response.nineYearGrowth());
+        growthValues.put("10Y", response.tenYearGrowth());
+
+        double availableWeightsSum = growthValues.entrySet().stream()
+                .filter(entry -> entry.getValue() != 0.0)
+                .mapToDouble(entry -> weights.get(entry.getKey()))
+                .sum();
+
+        double score = growthValues.entrySet().stream()
+                .filter(entry -> entry.getValue() != 0.0)
+                .mapToDouble(entry -> {
+                    double normalizedWeight = weights.get(entry.getKey()) / availableWeightsSum;
+                    return entry.getValue() * normalizedWeight;
+                })
+                .sum();
+
+        return Math.round(score * 100.0) / 100.0;
     }
 }

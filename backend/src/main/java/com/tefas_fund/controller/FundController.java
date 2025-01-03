@@ -30,9 +30,9 @@ public class FundController {
             @RequestParam(required = false) String searchTerm,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "symbol") String sortBy
+            @RequestParam(defaultValue = "point") String sortBy
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
         return fundService.getYield(searchTerm, pageable);
     }
 }
