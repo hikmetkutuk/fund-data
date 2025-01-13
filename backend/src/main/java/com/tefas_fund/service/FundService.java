@@ -201,7 +201,6 @@ public class FundService {
         weights.put("9Y", 16.119);   // 9 years
         weights.put("10Y", 17.91);  // 10 years
 
-        // Map periods to their growth values
         Map<String, Double> growthValues = new HashMap<>();
         growthValues.put("1M", response.oneMonthGrowth());
         growthValues.put("3M", response.threeMonthGrowth());

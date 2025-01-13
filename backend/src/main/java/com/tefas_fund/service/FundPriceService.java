@@ -39,9 +39,9 @@ public class FundPriceService {
 
         try {
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='MainContent_RadioButtonListPeriod_7']")));
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='MainContent_RadioButtonListPeriod_0']")));
 
-            WebElement radioButton = driver.findElement(By.id("MainContent_RadioButtonListPeriod_7"));
+            WebElement radioButton = driver.findElement(By.id("MainContent_RadioButtonListPeriod_0"));
             radioButton.click();
 
             Thread.sleep(2000);
