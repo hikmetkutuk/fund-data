@@ -13,5 +13,5 @@ public interface CurrencyRepository extends JpaRepository<CurrencyPrice, Long> {
     boolean existsByCurrencyAndDate(String currency, LocalDate date);
 
     @Query("SELECT c FROM CurrencyPrice c WHERE c.currency = :currency AND c.date <= :date ORDER BY c.date DESC LIMIT 1")
-
-    Optional<CurrencyPrice> findByCurrencyAndDate(String currency, LocalDate date);}
+    Optional<CurrencyPrice> findByCurrencyAndDate(String currency, LocalDate date);
+}

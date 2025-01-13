@@ -217,16 +217,21 @@ public class FundService {
         growthValues.put("9Y", response.nineYearGrowth());
         growthValues.put("10Y", response.tenYearGrowth());
 
-        double availableWeightsSum = growthValues.entrySet().stream()
-                .filter(entry -> entry.getValue() != 0.0)
-                .mapToDouble(entry -> weights.get(entry.getKey()))
-                .sum();
+        final double longTermMultiplier = 1.2;
 
         double score = growthValues.entrySet().stream()
-                .filter(entry -> entry.getValue() != 0.0)
+                .filter(entry -> {
+                    return entry.getValue() != null && entry.getValue() > 0.0;
+                })
                 .mapToDouble(entry -> {
-                    double normalizedWeight = weights.get(entry.getKey()) / availableWeightsSum;
-                    return entry.getValue() * normalizedWeight;
+                    double weight = weights.getOrDefault(entry.getKey(), 0.0);
+                    if (weight == 0.0) {
+                        return 0.0;
+                    }
+                    if (weight >= weights.get("3Y")) {
+                        weight *= longTermMultiplier;
+                    }
+                    return entry.getValue() / weight;
                 })
                 .sum();
 
