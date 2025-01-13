@@ -10,7 +10,7 @@ const Yield = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 20,
+    pageSize: 500,
   });
   const [totalPages, setTotalPages] = useState<number>(0);
   const [sort, setSort] = useState<string>("id,asc");
