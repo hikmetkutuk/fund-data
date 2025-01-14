@@ -27,14 +27,16 @@ import { Input } from "./ui/input";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  filterBy: string;
+  filterBySymbol: string;
+  filterByIndex: string;
   pageSize: number;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  filterBy,
+  filterBySymbol,
+  filterByIndex,
   pageSize,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -68,12 +70,20 @@ export function DataTable<TData, TValue>({
     <div className="rounded-md border">
       <div className="flex items-center p-4">
         <Input
-          placeholder={`Filter ${filterBy}...`}
-          value={(table.getColumn(filterBy)?.getFilterValue() as string) ?? ""}
+          placeholder={`Filter ${filterBySymbol}...`}
+          value={(table.getColumn(filterBySymbol)?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn(filterBy)?.setFilterValue(event.target.value)
+            table.getColumn(filterBySymbol)?.setFilterValue(event.target.value)
           }
-          className="max-w-xs"
+          className="max-w-xs ml-2"
+        />
+        <Input
+          placeholder={`Filter ${filterByIndex}...`}
+          value={(table.getColumn(filterByIndex)?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn(filterByIndex)?.setFilterValue(event.target.value)
+          }
+          className="max-w-xs ml-2"
         />
       </div>
       <Table>

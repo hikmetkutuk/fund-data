@@ -93,7 +93,7 @@ const Yield = () => {
   return (
     <div className="w-11/12 mx-auto py-10 dark:text-orange-200 text-xs">
       <h1 className="text-2xl font-bold mb-4 dark:text-orange-200 text-center">Fund Yield</h1>
-      <DataTable columns={columns} data={serializedData} filterBy="symbol" pageSize={pagination.pageSize} />
+      <DataTable columns={columns} data={serializedData} filterBySymbol="symbol" filterByIndex="index" pageSize={pagination.pageSize} />
       <div className="flex items-center justify-between py-4 dark:bg-slate-800 text-xs">
         <Button
           className="bg-orange-200 text-slate-800"
