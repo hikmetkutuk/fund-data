@@ -13,3 +13,7 @@ This is usually caused by the sequence not being set correctly.
 you can use the following method:
 
 ``SELECT fl.* FROM public.funds fl LEFT JOIN public.fund_prices fp ON fl.symbol = fp.symbol AND fp.date = '2024-12-27' WHERE fp.symbol IS NULL``
+
+
+> For price regulation after the fund is split
+``UPDATE public.fund_prices SET price=price/10000 WHERE symbol = 'TI2';``
