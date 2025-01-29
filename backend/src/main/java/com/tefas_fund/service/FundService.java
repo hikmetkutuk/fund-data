@@ -14,10 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -65,9 +63,11 @@ public class FundService {
 
         Map<LocalDate, Double> currencyPrices = fetchCurrencyPrices();
 
-        return fundMap.keySet().parallelStream()
+        var records = fundMap.keySet().parallelStream()
                 .map(symbol -> calculateResponseForFund(symbol, currencyPrices))
                 .toList();
+
+        return calculateScore(records);
     }
 
     private Map<LocalDate, Double> fetchCurrencyPrices() {
@@ -113,8 +113,6 @@ public class FundService {
                 calculateGrowth(fund, TODAY.minusYears(10), currencyPrices),
                 0
         );
-        double point = calculatePoints(response);
-
         return new CalculateResponse(
                 response.symbol(),
                 response.index(),
@@ -132,7 +130,7 @@ public class FundService {
                 response.eightYearGrowth(),
                 response.nineYearGrowth(),
                 response.tenYearGrowth(),
-                point
+                0
         );
     }
 
@@ -175,7 +173,7 @@ public class FundService {
                 response.eightYearGrowth(),
                 response.nineYearGrowth(),
                 response.tenYearGrowth(),
-                response.point()
+                response.score()
         );
     }
 
@@ -184,57 +182,110 @@ public class FundService {
         return yieldRepository.findAll(spec, pageable);
     }
 
-    private double calculatePoints(CalculateResponse response) {
+    private List<CalculateResponse> calculateScore(List<CalculateResponse> records) {
+        LocalDate startOfYear = LocalDate.of(LocalDate.now().getYear(), 1, 1);
+        LocalDate today = LocalDate.now();
+        long ytdMonths = ChronoUnit.MONTHS.between(startOfYear, today);
+
         Map<String, Double> weights = new HashMap<>();
-        weights.put("1M", 0.14925);   // 1 month
-        weights.put("3M", 0.44775);   // 3 months
-        weights.put("6M", 0.8955);   // 6 months
-        weights.put("YTD", 0.0);  // YTD
-        weights.put("1Y", 1.7935);   // 1 year + 0,0025
-        weights.put("2Y", 3.582);   // 2 years
-        weights.put("3Y", 5.373);   // 3 years
-        weights.put("4Y", 7.164);   // 4 years
-        weights.put("5Y", 8.955);   // 5 years
-        weights.put("6Y", 10.746);   // 6 years
-        weights.put("7Y", 12.537);   // 7 years
-        weights.put("8Y", 14.328);   // 8 years
-        weights.put("9Y", 16.119);   // 9 years
-        weights.put("10Y", 17.91);  // 10 years
+        weights.put("3M", 0.7);   // 3 months
+        weights.put("6M", 0.75);   // 6 months
+        if (ytdMonths > 6) {
+            weights.put("YTD", 0.85);  // YTD
+        }
+        weights.put("1Y", 1.0);   // 1 year
+        weights.put("2Y", 1.0);   // 2 years
+        weights.put("3Y", 1.0);   // 3 years
+        weights.put("4Y", 1.0);   // 4 years
+        weights.put("5Y", 1.0);   // 5 years
+        weights.put("6Y", 1.0);   // 6 years
+        weights.put("7Y", 1.0);   // 7 years
+        weights.put("8Y", 1.0);   // 8 years
+        weights.put("9Y", 1.0);   // 9 years
+        weights.put("10Y", 1.0);  // 10 years
 
-        Map<String, Double> growthValues = new HashMap<>();
-        growthValues.put("1M", response.oneMonthGrowth());
-        growthValues.put("3M", response.threeMonthGrowth());
-        growthValues.put("6M", response.sixMonthGrowth());
-        growthValues.put("YTD", response.ytdGrowth());
-        growthValues.put("1Y", response.oneYearGrowth());
-        growthValues.put("2Y", response.twoYearGrowth());
-        growthValues.put("3Y", response.threeYearGrowth());
-        growthValues.put("4Y", response.fourYearGrowth());
-        growthValues.put("5Y", response.fiveYearGrowth());
-        growthValues.put("6Y", response.sixYearGrowth());
-        growthValues.put("7Y", response.sevenYearGrowth());
-        growthValues.put("8Y", response.eightYearGrowth());
-        growthValues.put("9Y", response.nineYearGrowth());
-        growthValues.put("10Y", response.tenYearGrowth());
+        Map<String, Double> maxValues = calculateMaxValues(records);
+        List<CalculateResponse> updatedRecords = new ArrayList<>();
 
-        final double longTermMultiplier = 1.2;
+        for (CalculateResponse record : records) {
+            double numerator = 0.0;
+            double denominator = 0.0;
 
-        double score = growthValues.entrySet().stream()
-                .filter(entry -> {
-                    return entry.getValue() != null && entry.getValue() > 0.0;
-                })
-                .mapToDouble(entry -> {
-                    double weight = weights.getOrDefault(entry.getKey(), 0.0);
-                    if (weight == 0.0) {
-                        return 0.0;
-                    }
-                    if (weight >= weights.get("3Y")) {
-                        weight *= longTermMultiplier;
-                    }
-                    return entry.getValue() / weight;
-                })
-                .sum();
+            for (Map.Entry<String, Double> entry : weights.entrySet()) {
+                String key = entry.getKey();
+                Double weight = entry.getValue();
+                Double value = getGrowthValue(record, key);
 
-        return Math.round(score * 100.0) / 100.0;
+                if (value != null && value != 0.0 && weight > 0.0) {
+                    numerator += value / maxValues.get(key) * weight;
+                    denominator += weight;
+                }
+            }
+
+            double score = (denominator == 0.0) ? 0.0 : (numerator / denominator) * 100;
+            double roundedScore = Math.round(score * 100.0) / 100.0;
+
+            CalculateResponse updatedRecord = new CalculateResponse(
+                    record.symbol(),
+                    record.index(),
+                    record.oneMonthGrowth(),
+                    record.threeMonthGrowth(),
+                    record.sixMonthGrowth(),
+                    record.ytdGrowth(),
+                    record.oneYearGrowth(),
+                    record.twoYearGrowth(),
+                    record.threeYearGrowth(),
+                    record.fourYearGrowth(),
+                    record.fiveYearGrowth(),
+                    record.sixYearGrowth(),
+                    record.sevenYearGrowth(),
+                    record.eightYearGrowth(),
+                    record.nineYearGrowth(),
+                    record.tenYearGrowth(),
+                    roundedScore
+            );
+            updatedRecords.add(updatedRecord);
+        }
+
+        return updatedRecords;
+    }
+
+    private static Map<String, Double> calculateMaxValues(List<CalculateResponse> records) {
+        Map<String, Double> maxValues = new HashMap<>();
+        maxValues.put("1M", records.stream().mapToDouble(CalculateResponse::oneMonthGrowth).max().orElse(1.0));
+        maxValues.put("3M", records.stream().mapToDouble(CalculateResponse::threeMonthGrowth).max().orElse(1.0));
+        maxValues.put("6M", records.stream().mapToDouble(CalculateResponse::sixMonthGrowth).max().orElse(1.0));
+        maxValues.put("YTD", records.stream().mapToDouble(CalculateResponse::ytdGrowth).max().orElse(1.0));
+        maxValues.put("1Y", records.stream().mapToDouble(CalculateResponse::oneYearGrowth).max().orElse(1.0));
+        maxValues.put("2Y", records.stream().mapToDouble(CalculateResponse::twoYearGrowth).max().orElse(1.0));
+        maxValues.put("3Y", records.stream().mapToDouble(CalculateResponse::threeYearGrowth).max().orElse(1.0));
+        maxValues.put("4Y", records.stream().mapToDouble(CalculateResponse::fourYearGrowth).max().orElse(1.0));
+        maxValues.put("5Y", records.stream().mapToDouble(CalculateResponse::fiveYearGrowth).max().orElse(1.0));
+        maxValues.put("6Y", records.stream().mapToDouble(CalculateResponse::sixYearGrowth).max().orElse(1.0));
+        maxValues.put("7Y", records.stream().mapToDouble(CalculateResponse::sevenYearGrowth).max().orElse(1.0));
+        maxValues.put("8Y", records.stream().mapToDouble(CalculateResponse::eightYearGrowth).max().orElse(1.0));
+        maxValues.put("9Y", records.stream().mapToDouble(CalculateResponse::nineYearGrowth).max().orElse(1.0));
+        maxValues.put("10Y", records.stream().mapToDouble(CalculateResponse::tenYearGrowth).max().orElse(1.0));
+        return maxValues;
+    }
+
+    private static Double getGrowthValue(CalculateResponse record, String key) {
+        return switch (key) {
+            case "1M" -> record.oneMonthGrowth();
+            case "3M" -> record.threeMonthGrowth();
+            case "6M" -> record.sixMonthGrowth();
+            case "YTD" -> record.ytdGrowth();
+            case "1Y" -> record.oneYearGrowth();
+            case "2Y" -> record.twoYearGrowth();
+            case "3Y" -> record.threeYearGrowth();
+            case "4Y" -> record.fourYearGrowth();
+            case "5Y" -> record.fiveYearGrowth();
+            case "6Y" -> record.sixYearGrowth();
+            case "7Y" -> record.sevenYearGrowth();
+            case "8Y" -> record.eightYearGrowth();
+            case "9Y" -> record.nineYearGrowth();
+            case "10Y" -> record.tenYearGrowth();
+            default -> 0.0;
+        };
     }
 }
