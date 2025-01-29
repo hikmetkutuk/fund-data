@@ -50,7 +50,7 @@ const Yield = () => {
     createColumn("eightYear", "8Y"),
     createColumn("nineYear", "9Y"),
     createColumn("tenYear", "10Y"),
-    createColumn("point", "Point"),
+    createColumn("score", "Score"),
   ];
 
   const serializedData = yields.map((item: IYield) => ({
@@ -72,7 +72,7 @@ const Yield = () => {
     eightYear: item.eightYear,
     nineYear: item.nineYear,
     tenYear: item.tenYear,
-    point: item.point,
+    score: item.score,
   }));
 
   const handlePageChange = (e: React.ChangeEvent<HTMLInputElement>) => {

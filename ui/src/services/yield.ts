@@ -18,7 +18,7 @@ export interface IYield {
     eightYear: number;
     nineYear: number;
     tenYear: number;
-    point: number;
+    score: number;
 }
 
 export interface PaginatedResponse<T> {
