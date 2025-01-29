@@ -25,7 +25,7 @@ public class Yield {
     private Double eightYear;
     private Double nineYear;
     private Double tenYear;
-    private double point;
+    private double score;
 
 
     public Yield() {
@@ -48,7 +48,7 @@ public class Yield {
             Double eightYear,
             Double nineYear,
             Double tenYear,
-            double point) {
+            double score) {
         this.symbol = symbol;
         this.index = index;
         this.oneMonth = oneMonth;
@@ -65,7 +65,7 @@ public class Yield {
         this.eightYear = eightYear;
         this.nineYear = nineYear;
         this.tenYear = tenYear;
-        this.point = point;
+        this.score = score;
     }
 
     public Long getId() {
@@ -204,11 +204,11 @@ public class Yield {
         this.tenYear = tenYear;
     }
 
-    public double getPoint() {
-        return point;
+    public double getScore() {
+        return score;
     }
 
-    public void setPoint(double point) {
-        this.point = point;
+    public void setScore(double score) {
+        this.score = score;
     }
 }
