@@ -81,6 +81,7 @@ public class CurrencyService {
     public void csvReader() {
         String filePath = "src/main/resources/usd.csv";
         List<CurrencyResponse> records = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -91,19 +92,29 @@ public class CurrencyService {
                 if (values.length == 4) {
                     Long id = Long.parseLong(values[0]);
                     String name = values[1];
-                    LocalDate date = LocalDate.parse(values[2]);
+                    LocalDate date = LocalDate.parse(values[2], formatter);
                     Double value = Double.parseDouble(values[3]);
                     CurrencyResponse record = new CurrencyResponse(id, name, date, value);
                     records.add(record);
+
+                    if (!currencyRepository.existsByCurrencyAndDate(name, date)) {
+                        CurrencyPrice newCurrency = new CurrencyPrice();
+                        newCurrency.setCurrency(name);
+                        newCurrency.setDate(date);
+                        newCurrency.setPrice(value);
+                        currencyRepository.save(newCurrency);
+                    }
                 }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        for (Record record : records) {
+
+        for (CurrencyResponse record : records) {
             System.out.println(record);
         }
     }
+
 
     public Double getCurrencyPrice(String currency, LocalDate date) {
         return currencyRepository.findByCurrencyAndDate(currency, date).get().getPrice();
