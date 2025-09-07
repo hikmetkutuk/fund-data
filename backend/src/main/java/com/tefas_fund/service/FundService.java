@@ -86,7 +86,12 @@ public class FundService {
                         TODAY.minusYears(7),
                         TODAY.minusYears(8),
                         TODAY.minusYears(9),
-                        TODAY.minusYears(10)
+                        TODAY.minusYears(10),
+                        TODAY.minusYears(11),
+                        TODAY.minusYears(12),
+                        TODAY.minusYears(13),
+                        TODAY.minusYears(14),
+                        TODAY.minusYears(15)
                 )
                 .distinct()
                 .collect(Collectors.toMap(date -> date, date -> currencyService.getCurrencyPrice("USDTRY", date)));
@@ -111,6 +116,11 @@ public class FundService {
                 calculateGrowth(fund, TODAY.minusYears(8), currencyPrices),
                 calculateGrowth(fund, TODAY.minusYears(9), currencyPrices),
                 calculateGrowth(fund, TODAY.minusYears(10), currencyPrices),
+                calculateGrowth(fund, TODAY.minusYears(11), currencyPrices),
+                calculateGrowth(fund, TODAY.minusYears(12), currencyPrices),
+                calculateGrowth(fund, TODAY.minusYears(13), currencyPrices),
+                calculateGrowth(fund, TODAY.minusYears(14), currencyPrices),
+                calculateGrowth(fund, TODAY.minusYears(15), currencyPrices),
                 0
         );
         return new CalculateResponse(
@@ -130,6 +140,11 @@ public class FundService {
                 response.eightYearGrowth(),
                 response.nineYearGrowth(),
                 response.tenYearGrowth(),
+                response.elevenYearGrowth(),
+                response.twelveYearGrowth(),
+                response.thirteenYearGrowth(),
+                response.fourteenYearGrowth(),
+                response.fifteenYearGrowth(),
                 0
         );
     }
@@ -173,6 +188,11 @@ public class FundService {
                 response.eightYearGrowth(),
                 response.nineYearGrowth(),
                 response.tenYearGrowth(),
+                response.elevenYearGrowth(),
+                response.twelveYearGrowth(),
+                response.thirteenYearGrowth(),
+                response.fourteenYearGrowth(),
+                response.fifteenYearGrowth(),
                 response.score()
         );
     }
@@ -190,19 +210,22 @@ public class FundService {
         Map<String, Double> weights = new HashMap<>();
         weights.put("3M", 0.7);   // 3 months
         weights.put("6M", 0.75);   // 6 months
-        if (ytdMonths > 6) {
-            weights.put("YTD", 0.85);  // YTD
-        }
+        weights.put("YTD", 0.85);  // YTD
         weights.put("1Y", 1.0);   // 1 year
-        weights.put("2Y", 1.0);   // 2 years
-        weights.put("3Y", 1.0);   // 3 years
-        weights.put("4Y", 1.0);   // 4 years
-        weights.put("5Y", 1.0);   // 5 years
-        weights.put("6Y", 1.0);   // 6 years
-        weights.put("7Y", 1.0);   // 7 years
-        weights.put("8Y", 1.0);   // 8 years
-        weights.put("9Y", 1.0);   // 9 years
-        weights.put("10Y", 1.0);  // 10 years
+        weights.put("2Y", 1.1);   // 2 years
+        weights.put("3Y", 1.2);   // 3 years
+        weights.put("4Y", 1.3);   // 4 years
+        weights.put("5Y", 1.4);   // 5 years
+        weights.put("6Y", 1.5);   // 6 years
+        weights.put("7Y", 1.6);   // 7 years
+        weights.put("8Y", 1.7);   // 8 years
+        weights.put("9Y", 1.8);   // 9 years
+        weights.put("10Y", 1.9);  // 10 years
+        weights.put("11Y", 2.0);  // 11 years
+        weights.put("12Y", 2.1);  // 12 years
+        weights.put("13Y", 2.2);  // 13 years
+        weights.put("14Y", 2.3);  // 14 years
+        weights.put("15Y", 2.4);  // 15 years
 
         Map<String, Double> maxValues = calculateMaxValues(records);
         List<CalculateResponse> updatedRecords = new ArrayList<>();
@@ -242,6 +265,11 @@ public class FundService {
                     record.eightYearGrowth(),
                     record.nineYearGrowth(),
                     record.tenYearGrowth(),
+                    record.elevenYearGrowth(),
+                    record.twelveYearGrowth(),
+                    record.thirteenYearGrowth(),
+                    record.fourteenYearGrowth(),
+                    record.fifteenYearGrowth(),
                     roundedScore
             );
             updatedRecords.add(updatedRecord);
@@ -266,6 +294,11 @@ public class FundService {
         maxValues.put("8Y", records.stream().mapToDouble(CalculateResponse::eightYearGrowth).max().orElse(1.0));
         maxValues.put("9Y", records.stream().mapToDouble(CalculateResponse::nineYearGrowth).max().orElse(1.0));
         maxValues.put("10Y", records.stream().mapToDouble(CalculateResponse::tenYearGrowth).max().orElse(1.0));
+        maxValues.put("11Y", records.stream().mapToDouble(CalculateResponse::elevenYearGrowth).max().orElse(1.0));
+        maxValues.put("12Y", records.stream().mapToDouble(CalculateResponse::twelveYearGrowth).max().orElse(1.0));
+        maxValues.put("13Y", records.stream().mapToDouble(CalculateResponse::thirteenYearGrowth).max().orElse(1.0));
+        maxValues.put("14Y", records.stream().mapToDouble(CalculateResponse::fourteenYearGrowth).max().orElse(1.0));
+        maxValues.put("15Y", records.stream().mapToDouble(CalculateResponse::fifteenYearGrowth).max().orElse(1.0));
         return maxValues;
     }
 
@@ -285,6 +318,11 @@ public class FundService {
             case "8Y" -> record.eightYearGrowth();
             case "9Y" -> record.nineYearGrowth();
             case "10Y" -> record.tenYearGrowth();
+            case "11Y" -> record.elevenYearGrowth();
+            case "12Y" -> record.twelveYearGrowth();
+            case "13Y" -> record.thirteenYearGrowth();
+            case "14Y" -> record.fourteenYearGrowth();
+            case "15Y" -> record.fifteenYearGrowth();
             default -> 0.0;
         };
     }

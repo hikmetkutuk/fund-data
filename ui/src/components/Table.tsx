@@ -1,5 +1,6 @@
 "use client";
-
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -66,6 +67,22 @@ export function DataTable<TData, TValue>({
     pageCount: Math.ceil(data.length / pagination.pageSize),
   });
 
+  const exportToExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+
+    const blob = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    saveAs(blob, "table.xlsx");
+  };
+
   return (
     <div className="rounded-md border">
       <div className="flex items-center p-4">
@@ -85,6 +102,12 @@ export function DataTable<TData, TValue>({
           }
           className="max-w-xs ml-2"
         />
+        <button
+          onClick={exportToExcel}
+          className="ml-auto rounded bg-blue-500 text-white px-3 py-1 hover:bg-blue-600"
+        >
+          Export Excel
+        </button>
       </div>
       <Table>
         <TableHeader>

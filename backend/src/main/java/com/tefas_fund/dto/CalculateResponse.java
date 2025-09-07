@@ -17,5 +17,10 @@ public record CalculateResponse(
     double eightYearGrowth,
     double nineYearGrowth,
     double tenYearGrowth,
+    double elevenYearGrowth,
+    double twelveYearGrowth,
+    double thirteenYearGrowth,
+    double fourteenYearGrowth,
+    double fifteenYearGrowth,
     double score
 ) {}

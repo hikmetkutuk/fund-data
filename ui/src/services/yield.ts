@@ -18,6 +18,11 @@ export interface IYield {
     eightYear: number;
     nineYear: number;
     tenYear: number;
+    elevenYear: number;
+    twelveYear: number;
+    thirteenYear: number;
+    fourteenYear: number;
+    fifteenYear: number;
     score: number;
 }
 
@@ -33,7 +38,7 @@ export const fetchFundYield = async (
     size: number,
     sort: string
 ): Promise<PaginatedResponse<IYield>> => {
-    const response = await axios.get<PaginatedResponse<IYield>>('http://localhost:8080/api/fund/yield', {
+    const response = await axios.get<PaginatedResponse<IYield>>('http://localhost:8081/api/fund/yield', {
         params: {
             searchTerm,
             page,

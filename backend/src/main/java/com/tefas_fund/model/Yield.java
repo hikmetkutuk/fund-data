@@ -25,6 +25,11 @@ public class Yield {
     private Double eightYear;
     private Double nineYear;
     private Double tenYear;
+    private Double elevenYear;
+    private Double twelveYear;
+    private Double thirteenYear;
+    private Double fourteenYear;
+    private Double fifteenYear;
     private double score;
 
 
@@ -48,6 +53,11 @@ public class Yield {
             Double eightYear,
             Double nineYear,
             Double tenYear,
+            Double elevenYear,
+            Double twelveYear,
+            Double thirteenYear,
+            Double fourteenYear,
+            Double fifteenYear,
             double score) {
         this.symbol = symbol;
         this.index = index;
@@ -65,6 +75,11 @@ public class Yield {
         this.eightYear = eightYear;
         this.nineYear = nineYear;
         this.tenYear = tenYear;
+        this.elevenYear = elevenYear;
+        this.twelveYear = twelveYear;
+        this.thirteenYear = thirteenYear;
+        this.fourteenYear = fourteenYear;
+        this.fifteenYear = fifteenYear;
         this.score = score;
     }
 
@@ -202,6 +217,46 @@ public class Yield {
 
     public void setTenYear(Double tenYear) {
         this.tenYear = tenYear;
+    }
+
+    public Double getElevenYear() {
+        return elevenYear;
+    }
+
+    public void setElevenYear(Double elevenYear) {
+        this.elevenYear = elevenYear;
+    }
+
+    public Double getTwelveYear() {
+        return twelveYear;
+    }
+
+    public void setTwelveYear(Double twelveYear) {
+        this.twelveYear = twelveYear;
+    }
+
+    public Double getThirteenYear() {
+        return thirteenYear;
+    }
+
+    public void setThirteenYear(Double thirteenYear) {
+        this.thirteenYear = thirteenYear;
+    }
+
+    public Double getFourteenYear() {
+        return fourteenYear;
+    }
+
+    public void setFourteenYear(Double fourteenYear) {
+        this.fourteenYear = fourteenYear;
+    }
+
+    public Double getFifteenYear() {
+        return fifteenYear;
+    }
+
+    public void setFifteenYear(Double fifteenYear) {
+        this.fifteenYear = fifteenYear;
     }
 
     public double getScore() {
