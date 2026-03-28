@@ -10,11 +10,11 @@ import com.tefas_fund.repository.FundPriceRepository;
 import com.tefas_fund.util.YieldSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -50,7 +50,7 @@ public class FundService {
             List<Yield> entitiesToSave = newRecords.stream()
                     .map(this::mapToEntity)
                     .toList();
-            yieldRepository.saveAll(entitiesToSave);
+            yieldRepository.saveAll(Objects.requireNonNull(entitiesToSave));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -171,41 +171,38 @@ public class FundService {
     }
 
     private Yield mapToEntity(CalculateResponse response) {
-        return new Yield(
-                response.symbol(),
-                response.index(),
-                response.oneMonthGrowth(),
-                response.threeMonthGrowth(),
-                response.sixMonthGrowth(),
-                response.ytdGrowth(),
-                response.oneYearGrowth(),
-                response.twoYearGrowth(),
-                response.threeYearGrowth(),
-                response.fourYearGrowth(),
-                response.fiveYearGrowth(),
-                response.sixYearGrowth(),
-                response.sevenYearGrowth(),
-                response.eightYearGrowth(),
-                response.nineYearGrowth(),
-                response.tenYearGrowth(),
-                response.elevenYearGrowth(),
-                response.twelveYearGrowth(),
-                response.thirteenYearGrowth(),
-                response.fourteenYearGrowth(),
-                response.fifteenYearGrowth(),
-                response.score()
-        );
+        Yield entity = new Yield();
+        entity.setSymbol(response.symbol());
+        entity.setIndex(response.index());
+        entity.setOneMonth(response.oneMonthGrowth());
+        entity.setThreeMonth(response.threeMonthGrowth());
+        entity.setSixMonth(response.sixMonthGrowth());
+        entity.setYtd(response.ytdGrowth());
+        entity.setOneYear(response.oneYearGrowth());
+        entity.setTwoYear(response.twoYearGrowth());
+        entity.setThreeYear(response.threeYearGrowth());
+        entity.setFourYear(response.fourYearGrowth());
+        entity.setFiveYear(response.fiveYearGrowth());
+        entity.setSixYear(response.sixYearGrowth());
+        entity.setSevenYear(response.sevenYearGrowth());
+        entity.setEightYear(response.eightYearGrowth());
+        entity.setNineYear(response.nineYearGrowth());
+        entity.setTenYear(response.tenYearGrowth());
+        entity.setElevenYear(response.elevenYearGrowth());
+        entity.setTwelveYear(response.twelveYearGrowth());
+        entity.setThirteenYear(response.thirteenYearGrowth());
+        entity.setFourteenYear(response.fourteenYearGrowth());
+        entity.setFifteenYear(response.fifteenYearGrowth());
+        entity.setScore(response.score());
+        return entity;
     }
 
-    public Page<Yield> getYield(String searchTerm, Pageable pageable) {
+    public Page<Yield> getYield(String searchTerm, @NonNull Pageable pageable) {
         YieldSpecification spec = new YieldSpecification(searchTerm);
         return yieldRepository.findAll(spec, pageable);
     }
 
     private List<CalculateResponse> calculateScore(List<CalculateResponse> records) {
-        LocalDate startOfYear = LocalDate.of(LocalDate.now().getYear(), 1, 1);
-        LocalDate today = LocalDate.now();
-
         Map<String, Double> weights = new HashMap<>();
         weights.put("3M", 0.7);   // 3 months
         weights.put("6M", 0.75);   // 6 months
@@ -229,14 +226,14 @@ public class FundService {
         Map<String, Double> maxValues = calculateMaxValues(records);
         List<CalculateResponse> updatedRecords = new ArrayList<>();
 
-        for (CalculateResponse record : records) {
+        for (CalculateResponse response : records) {
             double numerator = 0.0;
             double denominator = 0.0;
 
             for (Map.Entry<String, Double> entry : weights.entrySet()) {
                 String key = entry.getKey();
                 Double weight = entry.getValue();
-                Double value = getGrowthValue(record, key);
+                Double value = getGrowthValue(response, key);
 
                 if (value != null && value != 0.0 && weight > 0.0) {
                     numerator += value / maxValues.get(key) * weight;
@@ -248,27 +245,27 @@ public class FundService {
             double roundedScore = Math.round(score * 100.0) / 100.0;
 
             CalculateResponse updatedRecord = new CalculateResponse(
-                    record.symbol(),
-                    record.index(),
-                    record.oneMonthGrowth(),
-                    record.threeMonthGrowth(),
-                    record.sixMonthGrowth(),
-                    record.ytdGrowth(),
-                    record.oneYearGrowth(),
-                    record.twoYearGrowth(),
-                    record.threeYearGrowth(),
-                    record.fourYearGrowth(),
-                    record.fiveYearGrowth(),
-                    record.sixYearGrowth(),
-                    record.sevenYearGrowth(),
-                    record.eightYearGrowth(),
-                    record.nineYearGrowth(),
-                    record.tenYearGrowth(),
-                    record.elevenYearGrowth(),
-                    record.twelveYearGrowth(),
-                    record.thirteenYearGrowth(),
-                    record.fourteenYearGrowth(),
-                    record.fifteenYearGrowth(),
+                    response.symbol(),
+                    response.index(),
+                    response.oneMonthGrowth(),
+                    response.threeMonthGrowth(),
+                    response.sixMonthGrowth(),
+                    response.ytdGrowth(),
+                    response.oneYearGrowth(),
+                    response.twoYearGrowth(),
+                    response.threeYearGrowth(),
+                    response.fourYearGrowth(),
+                    response.fiveYearGrowth(),
+                    response.sixYearGrowth(),
+                    response.sevenYearGrowth(),
+                    response.eightYearGrowth(),
+                    response.nineYearGrowth(),
+                    response.tenYearGrowth(),
+                    response.elevenYearGrowth(),
+                    response.twelveYearGrowth(),
+                    response.thirteenYearGrowth(),
+                    response.fourteenYearGrowth(),
+                    response.fifteenYearGrowth(),
                     roundedScore
             );
             updatedRecords.add(updatedRecord);
@@ -301,27 +298,27 @@ public class FundService {
         return maxValues;
     }
 
-    private static Double getGrowthValue(CalculateResponse record, String key) {
+    private static Double getGrowthValue(CalculateResponse response, String key) {
         return switch (key) {
-            case "1M" -> record.oneMonthGrowth();
-            case "3M" -> record.threeMonthGrowth();
-            case "6M" -> record.sixMonthGrowth();
-            case "YTD" -> record.ytdGrowth();
-            case "1Y" -> record.oneYearGrowth();
-            case "2Y" -> record.twoYearGrowth();
-            case "3Y" -> record.threeYearGrowth();
-            case "4Y" -> record.fourYearGrowth();
-            case "5Y" -> record.fiveYearGrowth();
-            case "6Y" -> record.sixYearGrowth();
-            case "7Y" -> record.sevenYearGrowth();
-            case "8Y" -> record.eightYearGrowth();
-            case "9Y" -> record.nineYearGrowth();
-            case "10Y" -> record.tenYearGrowth();
-            case "11Y" -> record.elevenYearGrowth();
-            case "12Y" -> record.twelveYearGrowth();
-            case "13Y" -> record.thirteenYearGrowth();
-            case "14Y" -> record.fourteenYearGrowth();
-            case "15Y" -> record.fifteenYearGrowth();
+            case "1M" -> response.oneMonthGrowth();
+            case "3M" -> response.threeMonthGrowth();
+            case "6M" -> response.sixMonthGrowth();
+            case "YTD" -> response.ytdGrowth();
+            case "1Y" -> response.oneYearGrowth();
+            case "2Y" -> response.twoYearGrowth();
+            case "3Y" -> response.threeYearGrowth();
+            case "4Y" -> response.fourYearGrowth();
+            case "5Y" -> response.fiveYearGrowth();
+            case "6Y" -> response.sixYearGrowth();
+            case "7Y" -> response.sevenYearGrowth();
+            case "8Y" -> response.eightYearGrowth();
+            case "9Y" -> response.nineYearGrowth();
+            case "10Y" -> response.tenYearGrowth();
+            case "11Y" -> response.elevenYearGrowth();
+            case "12Y" -> response.twelveYearGrowth();
+            case "13Y" -> response.thirteenYearGrowth();
+            case "14Y" -> response.fourteenYearGrowth();
+            case "15Y" -> response.fifteenYearGrowth();
             default -> 0.0;
         };
     }

@@ -8,10 +8,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.QueryHints;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface YieldRepository extends JpaRepository<Yield, Long>, JpaSpecificationExecutor<Yield> {
     @QueryHints(@QueryHint(name = "org.hibernate.fetchSize", value = "50"))  // Optimize fetch size
-    Page<Yield> findAll(Specification<Yield> spec, Pageable pageable);
+    @NonNull
+    Page<Yield> findAll(@Nullable Specification<Yield> spec, @NonNull Pageable pageable);
 }

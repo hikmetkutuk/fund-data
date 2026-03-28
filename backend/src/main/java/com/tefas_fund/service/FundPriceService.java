@@ -1,11 +1,14 @@
 package com.tefas_fund.service;
 
 import com.tefas_fund.config.ChromeDriverFactory;
+import com.tefas_fund.exception.FundPriceOperationException;
 import com.tefas_fund.model.FundPrice;
 import com.tefas_fund.repository.FundPriceRepository;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Service;
@@ -18,10 +21,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class FundPriceService {
+    private static final Logger logger = LoggerFactory.getLogger(FundPriceService.class);
+    private static final String DATE_KEY = "date";
+    private static final String PRICE_KEY = "price";
+
     private final FundPriceRepository fundPriceRepository;
     private final FundService fundService;
     private final ChromeDriverFactory chromeDriverFactory;
@@ -58,15 +64,17 @@ public class FundPriceService {
             List<Map<String, Object>> result = new ArrayList<>();
             for (int i = 0; i < dateSeries.size(); i++) {
                 Map<String, Object> dataPoint = new HashMap<>();
-                dataPoint.put("date", dateSeries.get(i));
-                dataPoint.put("price", priceData.get(i));
+                dataPoint.put(DATE_KEY, dateSeries.get(i));
+                dataPoint.put(PRICE_KEY, priceData.get(i));
                 result.add(dataPoint);
             }
 
             saveFundPriceData(fund, result);
-
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FundPriceOperationException("Scraping interrupted for ticker: " + fund, e);
         } catch (Exception e) {
-            throw new RuntimeException("Error while scraping data for ticker: " + fund, e);
+            throw new FundPriceOperationException("Error while scraping data for ticker: " + fund, e);
         } finally {
             driver.quit();
         }
@@ -76,28 +84,22 @@ public class FundPriceService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         fundPriceRepository.syncIdSequence();
         for (Map<String, Object> entry : data) {
-            String dateStr = (String) entry.get("date");
-            Object priceObject = entry.get("price");
-            double price = 0.0;
-
-            if (priceObject instanceof Long) {
-                price = ((Long) priceObject).doubleValue();
-            } else if (priceObject instanceof Double) {
-                price = (Double) priceObject;
-            }
+            String dateStr = (String) entry.get(DATE_KEY);
+            Object priceObject = entry.get(PRICE_KEY);
+            double price = toDouble(priceObject);
 
             LocalDate date = LocalDate.parse(dateStr, formatter);
 
             Optional<FundPrice> existingData = fundPriceRepository.findBySymbolAndDate(symbol, date);
             if (existingData.isPresent()) {
-                System.out.println("Data already exists for symbol: " + symbol + " and date: " + date);
+                logger.debug("Data already exists for symbol: {} and date: {}", symbol, date);
             } else {
-                FundPrice fund = new FundPrice();
-                fund.setSymbol(symbol);
-                fund.setDate(date);
-                fund.setPrice(price);
+                FundPrice fundPrice = new FundPrice();
+                fundPrice.setSymbol(symbol);
+                fundPrice.setDate(date);
+                fundPrice.setPrice(price);
 
-                fundPriceRepository.save(fund);
+                fundPriceRepository.save(fundPrice);
             }
         }
     }
@@ -121,12 +123,15 @@ public class FundPriceService {
             String data = spanElement.getText();
 
             Map<String, Object> dataPoint = new HashMap<>();
-            dataPoint.put("date", LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-            dataPoint.put("price", Double.parseDouble(data.replace(",", ".")));
+            dataPoint.put(DATE_KEY, LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+            dataPoint.put(PRICE_KEY, Double.parseDouble(data.replace(",", ".")));
             result.add(dataPoint);
             saveFundPriceData(fund, result);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.warn("Price fetch interrupted for fund {}", fund, e);
         } catch (Exception e) {
-            System.out.println("Fon Kodu: " + fund + ", Hata: Veri alınamadı. " + e.getMessage());
+            logger.warn("Fon Kodu: {}, Hata: Veri alınamadı.", fund, e);
         } finally {
             driver.quit();
         }
@@ -153,7 +158,7 @@ public class FundPriceService {
 
         return rawList.stream()
                 .map(String::valueOf)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<Double> extractDoubleList(WebDriver driver, String script) {
@@ -164,7 +169,7 @@ public class FundPriceService {
 
         return rawList.stream()
                 .map(this::toDouble)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private double toDouble(Object value) {

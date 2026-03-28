@@ -34,55 +34,8 @@ public class Yield {
 
 
     public Yield() {
+        // Required by JPA for entity instantiation.
     }
-
-    public Yield(
-            String symbol,
-            String index,
-            Double oneMonth,
-            Double threeMonth,
-            Double sixMonth,
-            Double ytd,
-            Double oneYear,
-            Double twoYear,
-            Double threeYear,
-            Double fourYear,
-            Double fiveYear,
-            Double sixYear,
-            Double sevenYear,
-            Double eightYear,
-            Double nineYear,
-            Double tenYear,
-            Double elevenYear,
-            Double twelveYear,
-            Double thirteenYear,
-            Double fourteenYear,
-            Double fifteenYear,
-            double score) {
-        this.symbol = symbol;
-        this.index = index;
-        this.oneMonth = oneMonth;
-        this.threeMonth = threeMonth;
-        this.sixMonth = sixMonth;
-        this.ytd = ytd;
-        this.oneYear = oneYear;
-        this.twoYear = twoYear;
-        this.threeYear = threeYear;
-        this.fourYear = fourYear;
-        this.fiveYear = fiveYear;
-        this.sixYear = sixYear;
-        this.sevenYear = sevenYear;
-        this.eightYear = eightYear;
-        this.nineYear = nineYear;
-        this.tenYear = tenYear;
-        this.elevenYear = elevenYear;
-        this.twelveYear = twelveYear;
-        this.thirteenYear = thirteenYear;
-        this.fourteenYear = fourteenYear;
-        this.fifteenYear = fifteenYear;
-        this.score = score;
-    }
-
     public Long getId() {
         return id;
     }
