@@ -5,9 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -19,4 +19,14 @@ public interface FundPriceRepository extends JpaRepository<FundPrice, Long> {
 
     @Query("SELECT f FROM FundPrice f WHERE f.symbol = :symbol AND f.date <= :date ORDER BY f.date DESC LIMIT 1")
     Optional<FundPrice> findByFundSymbolAndClosestDate(@Param("symbol") String symbol, @Param("date") LocalDate date);
+
+    @Transactional
+    @Query(value = """
+            SELECT setval(
+                pg_get_serial_sequence('fund_prices', 'id'),
+                COALESCE((SELECT MAX(id) FROM fund_prices), 0) + 1,
+                false
+            )
+            """, nativeQuery = true)
+    Long syncIdSequence();
 }

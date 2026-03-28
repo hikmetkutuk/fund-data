@@ -8,10 +8,10 @@ import com.tefas_fund.repository.YieldRepository;
 import com.tefas_fund.repository.FundRepository;
 import com.tefas_fund.repository.FundPriceRepository;
 import com.tefas_fund.util.YieldSpecification;
-import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -205,7 +205,6 @@ public class FundService {
     private List<CalculateResponse> calculateScore(List<CalculateResponse> records) {
         LocalDate startOfYear = LocalDate.of(LocalDate.now().getYear(), 1, 1);
         LocalDate today = LocalDate.now();
-        long ytdMonths = ChronoUnit.MONTHS.between(startOfYear, today);
 
         Map<String, Double> weights = new HashMap<>();
         weights.put("3M", 0.7);   // 3 months

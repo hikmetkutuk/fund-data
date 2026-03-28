@@ -1,18 +1,16 @@
 package com.tefas_fund.service;
 
+import com.tefas_fund.config.ChromeDriverFactory;
 import com.tefas_fund.dto.CurrencyRequest;
 import com.tefas_fund.dto.CurrencyResponse;
 import com.tefas_fund.model.CurrencyPrice;
 import com.tefas_fund.repository.CurrencyRepository;
-import io.github.bonigarcia.wdm.WebDriverManager;
-import jakarta.transaction.Transactional;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -25,18 +23,16 @@ import java.util.List;
 @Service
 public class CurrencyService {
     private final CurrencyRepository currencyRepository;
+    private final ChromeDriverFactory chromeDriverFactory;
 
-    public CurrencyService(CurrencyRepository currencyRepository) {
+    public CurrencyService(CurrencyRepository currencyRepository, ChromeDriverFactory chromeDriverFactory) {
         this.currencyRepository = currencyRepository;
+        this.chromeDriverFactory = chromeDriverFactory;
     }
 
     @Transactional
     public Double getUsdTryPrice(boolean willBeRecorded) {
-        WebDriverManager.chromedriver().setup();
-
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--disable-gpu");
-        WebDriver driver = new ChromeDriver(options);
+        WebDriver driver = chromeDriverFactory.createDriver();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         CurrencyRequest dailyUsdPrice = null;
         try {
@@ -65,6 +61,7 @@ public class CurrencyService {
             boolean exists = currencyRepository.existsByCurrencyAndDate(currencyRequest.currency(), currencyRequest.date());
 
             if (!exists) {
+                currencyRepository.syncIdSequence();
                 var newCurrency = new CurrencyPrice();
                 newCurrency.setCurrency(currencyRequest.currency());
                 newCurrency.setDate(currencyRequest.date());
@@ -82,6 +79,7 @@ public class CurrencyService {
         String filePath = "src/main/resources/usd.csv";
         List<CurrencyResponse> records = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        currencyRepository.syncIdSequence();
 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;

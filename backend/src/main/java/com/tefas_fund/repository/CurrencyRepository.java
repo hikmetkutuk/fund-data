@@ -4,6 +4,7 @@ import com.tefas_fund.model.CurrencyPrice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -14,4 +15,14 @@ public interface CurrencyRepository extends JpaRepository<CurrencyPrice, Long> {
 
     @Query("SELECT c FROM CurrencyPrice c WHERE c.currency = :currency AND c.date <= :date ORDER BY c.date DESC LIMIT 1")
     Optional<CurrencyPrice> findByCurrencyAndDate(String currency, LocalDate date);
+
+    @Transactional
+    @Query(value = """
+            SELECT setval(
+                pg_get_serial_sequence('currency_price', 'id'),
+                COALESCE((SELECT MAX(id) FROM currency_price), 0) + 1,
+                false
+            )
+            """, nativeQuery = true)
+    Long syncIdSequence();
 }
