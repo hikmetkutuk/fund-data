@@ -13,13 +13,20 @@ public class FundPriceController {
     }
 
     @GetMapping()
-    public void getPriceHistory() {
-        fundPriceService.getPriceHistory();
+    public void getPriceHistory(
+            @RequestParam(required = false) Integer days,
+            @RequestParam(required = false) Integer months
+    ) {
+        fundPriceService.getPriceHistory(days, months);
     }
 
     @GetMapping("/{fund}")
-    public void getData(@PathVariable String fund) {
-        fundPriceService.getData(fund);
+    public void getData(
+            @PathVariable String fund,
+            @RequestParam(required = false) Integer days,
+            @RequestParam(required = false) Integer months
+    ) {
+        fundPriceService.getData(fund, days, months);
     }
 
     @GetMapping("/daily")
